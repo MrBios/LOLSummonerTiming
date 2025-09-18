@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<Window x:Class="LOLSummonerTiming.KeyBindingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:LOLSummonerTiming"
+        Title="Назначения клавиш" Height="300" Width="450"
+        WindowStartupLocation="CenterOwner"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <local:KeyToStringConverter x:Key="KeyToStringConverter"/>
+    </Window.Resources>
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="InfoText" Grid.Row="0" Text="Выберите, какую клавишу изменить, затем нажмите новую."
+                   TextWrapping="Wrap" HorizontalAlignment="Center" Margin="10" Padding="10"/>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.6*"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!-- Top -->
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,8" Text="Top:" HorizontalAlignment="Right"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,8,8" IsReadOnly="True" HorizontalAlignment="Left" MinWidth="150"
+                     Text="{Binding TopKey, Converter={StaticResource KeyToStringConverter}}" MouseLeftButtonDown="SelectTop_Click"  Cursor="Hand"/>
+
+            <!-- Jungle -->
+            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,8" Text="Jungle:" HorizontalAlignment="Right"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,8,8" IsReadOnly="True" HorizontalAlignment="Left" MinWidth="150"
+                     Text="{Binding JungleKey, Converter={StaticResource KeyToStringConverter}}" MouseLeftButtonDown="SelectJungle_Click" Cursor="Hand"/>
+
+            <!-- Mid -->
+            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,8" Text="Mid:" HorizontalAlignment="Right"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,8,8" IsReadOnly="True" HorizontalAlignment="Left" MinWidth="150"
+                     Text="{Binding MidKey, Converter={StaticResource KeyToStringConverter}}" MouseLeftButtonDown="SelectMid_Click" Cursor="Hand"/>
+
+            <!-- ADC -->
+            <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,8" Text="ADC:" HorizontalAlignment="Right"/>
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,0,8,8" IsReadOnly="True" HorizontalAlignment="Left" MinWidth="150"
+                     Text="{Binding AdcKey, Converter={StaticResource KeyToStringConverter}}" MouseLeftButtonDown="SelectAdc_Click" Cursor="Hand"/>
+
+            <!-- Support -->
+            <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0" Text="Support:" HorizontalAlignment="Right"/>
+            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,8,0" IsReadOnly="True" HorizontalAlignment="Left" MinWidth="150"
+                     Text="{Binding SupportKey, Converter={StaticResource KeyToStringConverter}}" MouseLeftButtonDown="SelectSupport_Click" Cursor="Hand"/>
+
+            <!-- Send -->
+            <TextBlock Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,8" Text="Send:" HorizontalAlignment="Right"/>
+            <TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,8,8" IsReadOnly="True" HorizontalAlignment="Left" MinWidth="150"
+         Text="{Binding SendKey, Converter={StaticResource KeyToStringConverter}}" MouseLeftButtonDown="SelectSend_Click"  Cursor="Hand"/>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <TextBlock x:Name="CaptureHint" VerticalAlignment="Center" Foreground="DarkOrange" Visibility="Collapsed" Margin="0,0,12,0"
+                       Text="Capture mode: press a key..."/>
+            <Button Width="90" Margin="0,0,8,0" Content="Закрыть" IsDefault="True" Click="Close_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,12 @@
+﻿<Application x:Class="LOLSummonerTiming.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:LOLSummonerTiming"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Global window icon so every Window gets favicon.ico by default -->
+        <Style TargetType="Window">
+            <Setter Property="Icon" Value="pack://application:,,,/favicon.ico" />
+        </Style>
+    </Application.Resources>
+</Application>
