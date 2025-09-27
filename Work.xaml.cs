@@ -14,9 +14,6 @@ using System.Windows.Shapes;
 
 namespace LOLSummonerTiming
 {
-    /// <summary>
-    /// Логика взаимодействия для Work.xaml
-    /// </summary>
     public partial class Work : Window
     {
         MainWindow main;

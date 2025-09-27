@@ -5,14 +5,6 @@ using System.Windows.Input;
 
 namespace LOLSummonerTiming
 {
-    // Global keyboard hook + keyboard input simulation
-    // Usage:
-    //   var kb = new GlobalKeyboard();
-    //   kb.Start();
-    //   kb.KeyDown += (s, e) => { /* e.VirtualKey, e.Key, e.Ctrl, e.Shift, e.Alt */ };
-    //   kb.TypeText("Hello");
-    //   kb.TypeChar('!');
-    //   kb.SendKeyPress(Key.Enter);
     public sealed class GlobalKeyboard : IDisposable
     {
         public event EventHandler<GlobalKeyEventArgs>? KeyDown;
@@ -71,7 +63,7 @@ namespace LOLSummonerTiming
 
                 if (args.Handled)
                 {
-                    return (IntPtr)1; // swallow the key
+                    return (IntPtr)1;
                 }
             }
 
@@ -90,10 +82,9 @@ namespace LOLSummonerTiming
 
         ~GlobalKeyboard()
         {
-            try { Stop(); } catch { /* ignore finalizer errors */ }
+            try { Stop(); } catch { }
         }
 
-        // ================= Keyboard layout helpers =================
         public const ushort LANG_EN_US = 0x0409;
         public const ushort LANG_RU_RU = 0x0419;
 
@@ -116,7 +107,6 @@ namespace LOLSummonerTiming
             if (GetLangIdFromHkl(current) == langId) return true;
 
             string klid = KlidFromLangId(langId);
-            // Load or get handle to desired layout
             var targetHkl = LoadKeyboardLayout(klid, KLF_ACTIVATE | KLF_SETFORPROCESS);
             if (targetHkl == IntPtr.Zero)
             {
@@ -124,10 +114,8 @@ namespace LOLSummonerTiming
                 if (targetHkl == IntPtr.Zero) return false;
             }
 
-            // Ask the foreground window to switch its input language
             SendMessage(hWnd, WM_INPUTLANGCHANGEREQUEST, IntPtr.Zero, targetHkl);
 
-            // Best effort verification
             System.Threading.Thread.Sleep(10);
             var after = GetKeyboardLayout(tid);
             return GetLangIdFromHkl(after) == langId;
@@ -143,8 +131,6 @@ namespace LOLSummonerTiming
             return string.Empty;
         }
 
-        // ================= Keyboard simulation =================
-        // Sends characters using UNICODE events. Works in classic apps, many games ignore it.
         public void TypeText(string text)
         {
             if (string.IsNullOrEmpty(text)) return;
@@ -152,7 +138,6 @@ namespace LOLSummonerTiming
             int idx = 0;
             foreach (var ch in text)
             {
-                // key down (unicode)
                 inputs[idx++] = new INPUT
                 {
                     type = INPUT_KEYBOARD,
@@ -168,7 +153,6 @@ namespace LOLSummonerTiming
                         }
                     }
                 };
-                // key up (unicode)
                 inputs[idx++] = new INPUT
                 {
                     type = INPUT_KEYBOARD,
@@ -245,7 +229,6 @@ namespace LOLSummonerTiming
         public void SendKeyDown(Key key) => SendKeyDown(KeyInterop.VirtualKeyFromKey(key));
         public void SendKeyUp(Key key) => SendKeyUp(KeyInterop.VirtualKeyFromKey(key));
 
-        // Use scan codes so games using Raw Input/DirectInput accept the events
         public void SendKeyDown(int virtualKey)
         {
             var layout = GetKeyboardLayout(0);
@@ -296,7 +279,6 @@ namespace LOLSummonerTiming
                 ThrowLastWin32Error("SendInput (KeyUp) failed");
         }
 
-        // Layout-aware physical typing using scan codes (works in most games)
         public void TypeTextPhysical(string text)
         {
             if (string.IsNullOrEmpty(text)) return;
@@ -309,7 +291,6 @@ namespace LOLSummonerTiming
                 short vkWithMods = VkKeyScanEx(ch, layout);
                 if (vkWithMods == -1)
                 {
-                    // Fallback to UNICODE for unknown chars
                     TypeChar(ch);
                     continue;
                 }
@@ -318,7 +299,6 @@ namespace LOLSummonerTiming
                 int mods = (vkWithMods >> 8) & 0xFF;
 
                 bool needShift = (mods & 1) != 0;
-                // We intentionally ignore Ctrl/Alt here to prevent sending chat-killing combos
 
                 if (needShift) SendKeyDown(VK_SHIFT);
                 SendKeyDown(vk);
@@ -331,22 +311,22 @@ namespace LOLSummonerTiming
         {
             return vk switch
             {
-                0x21 or // VK_PRIOR (Page Up)
-                0x22 or // VK_NEXT (Page Down)
-                0x23 or // VK_END
-                0x24 or // VK_HOME
-                0x25 or // VK_LEFT
-                0x26 or // VK_UP
-                0x27 or // VK_RIGHT
-                0x28 or // VK_DOWN
-                0x2D or // VK_INSERT
-                0x2E or // VK_DELETE
-                0x5B or // VK_LWIN
-                0x5C or // VK_RWIN
-                0x5D or // VK_APPS
-                0x6F or // VK_DIVIDE (numpad)
-                0xA3 or // VK_RCONTROL
-                0xA5     // VK_RMENU (Right Alt)
+                0x21 or
+                0x22 or
+                0x23 or
+                0x24 or
+                0x25 or
+                0x26 or
+                0x27 or
+                0x28 or
+                0x2D or
+                0x2E or
+                0x5B or
+                0x5C or
+                0x5D or
+                0x6F or
+                0xA3 or
+                0xA5
                 => true,
                 _ => false
             };
@@ -358,7 +338,6 @@ namespace LOLSummonerTiming
             throw new System.ComponentModel.Win32Exception(err, message + $" (0x{err:X})");
         }
 
-        // ================== Win32 interop ==================
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
         private const int WM_KEYUP = 0x0101;
@@ -376,15 +355,15 @@ namespace LOLSummonerTiming
 
         private const int VK_SHIFT = 0x10;
         private const int VK_CONTROL = 0x11;
-        private const int VK_MENU = 0x12; // Alt
+        private const int VK_MENU = 0x12;
         private const int VK_LSHIFT = 0xA0;
         private const int VK_RSHIFT = 0xA1;
         private const int VK_LCONTROL = 0xA2;
         private const int VK_RCONTROL = 0xA3;
-        private const int VK_LMENU = 0xA4; // Left Alt
-        private const int VK_RMENU = 0xA5; // Right Alt
+        private const int VK_LMENU = 0xA4;
+        private const int VK_RMENU = 0xA5;
 
-        private const int KL_NAMELENGTH = 9; // including null terminator
+        private const int KL_NAMELENGTH = 9;
         private const uint KLF_ACTIVATE = 0x00000001;
         private const uint KLF_SETFORPROCESS = 0x00000100;
 
